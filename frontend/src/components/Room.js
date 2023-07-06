@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Grid, Button, Typography } from '@mui/material';
 
 const Room = () => {
     const [votesToSkip, setVotesToSkip] = useState(2);
@@ -7,6 +8,19 @@ const Room = () => {
     const [isHost, setIsHost] = useState(false);
 
     const { roomCode } = useParams();
+    const navigate = useNavigate();
+
+    const leaveButtonPressed = () => {
+        const requestOptions = {
+            method: "POST",
+            headers: {'Content-Type': 'application/json'}
+        };
+        fetch('/api/leave-room', requestOptions).then((_response) => {
+            navigate('/');
+        });
+
+    };
+
 
     useEffect(() => {
         const getRoomDetails = () => {
@@ -21,15 +35,37 @@ const Room = () => {
 
     }, [roomCode]);
 
+
     
 
     return (
-        <div>
-            <h3>{roomCode}</h3>
-            <p>Votes: {votesToSkip}</p>
-            <p>Guest Can Pause: {guestCanPause.toString()}</p>
-            <p>Host: {isHost.toString()}</p>
-        </div>
+        <Grid container spacing={1}>
+            <Grid item xs={12} align="center">
+                <Typography variant="h4" component="h4">
+                    Code: {roomCode}
+                </Typography>
+            </Grid>
+            <Grid item xs={12} align="center">
+            <Typography variant="h6" component="h4">
+                    Votes: {votesToSkip}
+                </Typography>
+            </Grid>
+            <Grid item xs={12} align="center">
+            <Typography variant="h6" component="h4">
+                    Guest Can Pause: {guestCanPause.toString()}
+                </Typography>
+            </Grid>
+            <Grid item xs={12} align="center">
+            <Typography variant="h6" component="h4">
+                    Host: {isHost.toString()}
+                </Typography>
+            </Grid>
+            <Grid item xs={12} align="center">
+                <Button variant="contained" color="secondary" onClick={leaveButtonPressed}>
+                    Leave Room
+                </Button>
+            </Grid>
+        </Grid>
     );
 }
 
