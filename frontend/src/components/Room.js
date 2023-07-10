@@ -8,6 +8,7 @@ const Room = () => {
     const [guestCanPause, setGuestCanPause] = useState(false);
     const [isHost, setIsHost] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
+    const [spotifyAuthenticated, setSpotifyAuthenticated] = useState(false);
 
     const { roomCode } = useParams();
     const navigate = useNavigate();
@@ -15,6 +16,17 @@ const Room = () => {
     const updateRoomDetails = (data) => {
         setVotesToSkip(data.votes_to_skip);
         setGuestCanPause(data.guest_can_pause);
+    }
+
+    const authenticateSpotify = () => {
+        fetch('/spotify/is-authenticated').then((response) => response.json()).then((data) => {
+            setSpotifyAuthenticated(data.status);
+            if (!data.status) {
+                fetch('/spotify/get-auth-url').then((response) => response.json()).then((data) => {
+                    window.location.replace(data.url);
+                });
+            }
+        });
     }
 
     const leaveButtonPressed = () => {
@@ -74,6 +86,12 @@ const Room = () => {
         getRoomDetails();
 
     }, [roomCode]);
+
+    useEffect(() => {
+        if (isHost) {
+            authenticateSpotify();
+        }
+    }, [isHost]);
 
     if (showSettings) {
         return renderSettings();
